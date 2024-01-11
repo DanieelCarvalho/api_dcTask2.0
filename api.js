@@ -12,24 +12,40 @@ const app = express();
 //servidor para criar as reque post, get, delete
 const port = 3000;
 const privateKey = "galodelutaehmeuovo";
+import dayjs from "dayjs";
+import db from "./connect.js";
 //privateKey para gerar o token e verificar. palavra secreta
 app.use(express.json());
 app.use(cors());
 
-app.post("/cadastro", (req, res) => {
+app.get("/", async (req, res) => {
+  const usuarios = await db.db.query("SELECT * FROM usuarios");
+  res.send(usuarios[0]);
+});
+
+app.post("/cadastro", async (req, res) => {
   const senha = req.body.senha;
   const email = req.body.email;
   const hashSenha = bcrypt.hashSync(senha, 12);
-  const data = JSON.parse(fs.readFileSync("./db.json", "utf8"));
-  const usuarioExiste = !!data.usuario.find((u) => u.email === email);
+  const [resultado] = await db.db.query(
+    "SELECT * FROM usuarios WHERE email=?",
+    [email]
+  );
+  // const data = JSON.parse(fs.readFileSync("./db.json", "utf8"));
+  // const usuarioExiste = !!data.usuario.find((u) => u.email === email);
+  const [usuarioExiste] = resultado;
+  console.log(usuarioExiste);
   if (usuarioExiste) {
     return res.status(409).send({ message: "usuário já cadastrado" });
   }
-  const idUsuario = data.usuario.length + 1;
-  const usuario = { ...req.body, senha: hashSenha, id: idUsuario };
-  data.usuario.push(usuario);
-  fs.writeFileSync("./db.json", JSON.stringify(data));
-  res.status(201).send(usuario);
+  const sql = `INSERT INTO usuarios(nome, email, senha) VALUES ('${req.body.nome}', '${email}', '${hashSenha}')`;
+
+  const [result, fields] = await db.db.query({ sql });
+  // const idUsuario = data.usuario.length + 1;
+  // const usuario = { ...req.body, senha: hashSenha, id: idUsuario };
+  // data.usuario.push(usuario);
+  // fs.writeFileSync("./db.json", JSON.stringify(data));
+  res.status(201).send(result);
 });
 
 app.post("/login", (req, res) => {
@@ -67,18 +83,26 @@ app.post("/tarefas", (req, res) => {
   const decoded = jwt.verify(token, privateKey);
 
   console.log(decoded);
-  const { tarefa, fim, inicio, descricao, status } = req.body;
+  const { tarefa, fim, inicio, descricao } = req.body;
 
-  if (!tarefa || !fim || !inicio || !descricao || !status) {
+  if (!tarefa || !fim || !inicio || !descricao) {
     return res.status(400).send({ message: "payload inválido" });
   }
   const data = JSON.parse(fs.readFileSync("./db.json", "utf8"));
+
+  const tarefas = data.tarefas.filter(
+    (tarefa) => tarefa.usuarioId === decoded.id && !tarefa.estaDeletado
+  );
+  const teste2 = tarefas.map(() => {
+    return tarefa.fim === decoded.id;
+  });
+
   const novaTarefa = {
     tarefa,
-    fim,
     inicio,
+    fim,
     descricao,
-    status,
+    status: "Em andamento",
     estaDeletado: false,
     usuarioId: decoded.id,
     id: data.tarefas.length + 1,
@@ -104,6 +128,29 @@ app.get("/tarefas", (req, res) => {
   );
 
   res.status(200).send(tarefas);
+});
+
+app.get("/tarefas-atraso", (req, res) => {
+  const data = JSON.parse(fs.readFileSync("./db.json", "utf8"));
+  const dataAtual = new Date().toISOString();
+
+  const tarefas = data.tarefas.map((t) => {
+    const dataDif = (t.fim - dataAtual) / (1000 * 60 * 60 * 24);
+    if (t.status === "Realizada") {
+      return t;
+    } else if (t.fim > dataAtual && dataDif < 1) {
+      return { ...t, status: "Pendente" };
+    } else if (t.fim > dataAtual) {
+      return { ...t, status: "Em andamento" };
+    } else {
+      return { ...t, status: "Em atraso" };
+    }
+  });
+  data.tarefas = tarefas;
+  fs.writeFileSync("./db.json", JSON.stringify(data));
+  res.send(tarefas.filter((t) => t.status === "Em atraso"));
+
+  // console.log(dataFim, "vasco");
 });
 
 app.delete("/tarefas/:id", (req, res) => {

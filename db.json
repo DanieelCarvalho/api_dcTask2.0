@@ -1,1 +1,102 @@
-{"usuario":[{"nome":"Luiz Galo","email":"LuizGalo@gmail.com","senha":"$2b$12$MHONsIqVfjnVF1MuNHXYceAk7unvO6kNemBQGvylkakR6IzQfGlR.","id":1},{"nome":"Daniel","email":"Danielscg2012@gmail.com","senha":"$2b$12$rYtrvV6KbGUMtXN63.po.u2LTgmcixIMRiNCdiho5323VuT2ZDH6i","id":2},{"email":"thami@gmail.com","nome":"thamires","senha":"$2b$12$N2ar7QWi.ZonYeN9LyVUq.U9L27b71Mrb8zDkT3pLahh0uqi6TDjW","id":3},{"nome":"bruno","email":"bruno@gmail.com","senha":"$2b$12$bILMEUHnfi2eAeQ7w5o1IuXcPxij844BOMyQVe1HB2ZrblelPhM.K","id":4},{"nome":"pam","email":"pam@gmail.com","senha":"$2b$12$uWZ4ZSL10Ws/VB/CDG/eE.ZYMByUdehy7R9helfUPeRpLXnvEP03a","id":5}],"tarefas":[{"tarefa":"mercado","fim":"2024-10-04T00:00:00","inicio":"2024-01-04T15:00:23","descricao":"xxxx","status":"pendente","estaDeletado":false,"usuarioId":1,"id":1},{"tarefa":"feira","fim":"2024-10-04T00:00:00","inicio":"2024-01-04T15:00:23","descricao":"xxxx","status":"concluido","estaDeletado":true,"usuarioId":2,"id":2},{"tarefa":"corrida","fim":"2024-10-04T00:00:00","inicio":"2024-01-04T15:00:23","descricao":"xxxx","status":"pendente","estaDeletado":true,"usuarioId":2,"id":3},{"tarefa":"aaaa","fim":"2024-01-12T12:09","inicio":"2024-01-05T11:09","descricao":"aaaaaaaaa","status":"pendente","estaDeletado":true,"usuarioId":2,"id":4},{"tarefa":"mercado","fim":"2024-01-06T12:10","inicio":"2024-01-06T11:10","descricao":"mercado","status":"pendente","estaDeletado":true,"usuarioId":2,"id":5},{"tarefa":"casa","fim":"2024-01-06T12:16","inicio":"2024-01-05T11:16","descricao":"aaaaaa","status":"pendente","estaDeletado":true,"usuarioId":2,"id":6},{"tarefa":"bbbbbb","fim":"2024-01-13T11:31","inicio":"2024-01-04T11:30","descricao":"bbbbbb","status":"pendente","estaDeletado":true,"usuarioId":2,"id":7},{"tarefa":"aaaa","fim":"2024-01-13T11:33","inicio":"2024-01-05T11:33","descricao":"aaaaaaaaaaa","status":"pendente","estaDeletado":true,"usuarioId":2,"id":8},{"tarefa":"sasas","fim":"2024-01-04T12:41","inicio":"2024-01-05T12:41","descricao":"aaaaaaaaaaaaaaa","status":"pendente","estaDeletado":true,"usuarioId":2,"id":9},{"tarefa":"dada","fim":"2024-01-06T11:48","inicio":"2024-01-06T12:48","descricao":"aaaaa","status":"pendente","estaDeletado":true,"usuarioId":2,"id":10},{"tarefa":"casa","fim":"2024-01-06T12:54","inicio":"2024-01-06T11:54","descricao":"aaaa","status":"pendente","estaDeletado":true,"usuarioId":2,"id":11},{"tarefa":"ttt","fim":"2024-01-10T13:00","inicio":"2024-01-05T15:00","descricao":"tttttt","status":"pendente","estaDeletado":true,"usuarioId":2,"id":12},{"tarefa":"casa","fim":"2024-01-06T13:09","inicio":"2024-01-04T12:09","descricao":"aaaaaaaaaaa","status":"pendente","estaDeletado":true,"usuarioId":2,"id":13},{"tarefa":"rua","fim":"2024-01-06T13:09","inicio":"2024-01-04T12:09","descricao":"aaaaaaaaaaa","status":"pendente","estaDeletado":true,"usuarioId":2,"id":14},{"tarefa":"r","fim":"2024-01-14T13:13","inicio":"2024-01-04T14:13","descricao":"rr","status":"pendente","estaDeletado":true,"usuarioId":2,"id":15},{"tarefa":"casa","fim":"2024-01-06T13:46","inicio":"2024-01-05T12:45","descricao":"aaaaaa","status":"pendente","estaDeletado":true,"usuarioId":2,"id":16},{"tarefa":"casa","fim":"2024-01-18T15:11","inicio":"2024-01-06T16:11","descricao":"dsds","status":"pendente","estaDeletado":true,"usuarioId":2,"id":17},{"tarefa":"mercado","fim":"2024-01-13T18:14","inicio":"2024-01-06T15:14","descricao":"aaaaaaaaa","status":"pendente","estaDeletado":true,"usuarioId":2,"id":18},{"tarefa":"casa","fim":"2024-01-14T17:16","inicio":"2024-01-04T16:16","descricao":"aaaaaaaaaa","status":"pendente","estaDeletado":true,"usuarioId":2,"id":19},{"tarefa":"casa","fim":"2024-01-06T17:21","inicio":"2024-01-05T15:21","descricao":"aaaaaaaa","status":"pendente","estaDeletado":true,"usuarioId":2,"id":20},{"tarefa":"casa","fim":"2024-01-04T15:23","inicio":"2024-01-06T16:23","descricao":"aaaaaaaaaaa","status":"pendente","estaDeletado":true,"usuarioId":2,"id":21},{"tarefa":"corrida","fim":"2024-01-20T16:30","inicio":"2024-01-06T16:30","descricao":"aaaaaaaaaaaaa","status":"pendente","estaDeletado":false,"usuarioId":2,"id":22}]}
+{
+  "usuario": [
+    {
+      "nome": "Luiz Galo",
+      "email": "LuizGalo@gmail.com",
+      "senha": "$2b$12$MHONsIqVfjnVF1MuNHXYceAk7unvO6kNemBQGvylkakR6IzQfGlR.",
+      "id": 1
+    },
+    {
+      "nome": "Daniel",
+      "email": "Danielscg2012@gmail.com",
+      "senha": "$2b$12$rYtrvV6KbGUMtXN63.po.u2LTgmcixIMRiNCdiho5323VuT2ZDH6i",
+      "id": 2
+    },
+    {
+      "email": "thami@gmail.com",
+      "nome": "thamires",
+      "senha": "$2b$12$N2ar7QWi.ZonYeN9LyVUq.U9L27b71Mrb8zDkT3pLahh0uqi6TDjW",
+      "id": 3
+    },
+    {
+      "nome": "bruno",
+      "email": "bruno@gmail.com",
+      "senha": "$2b$12$bILMEUHnfi2eAeQ7w5o1IuXcPxij844BOMyQVe1HB2ZrblelPhM.K",
+      "id": 4
+    },
+    {
+      "nome": "pam",
+      "email": "pam@gmail.com",
+      "senha": "$2b$12$uWZ4ZSL10Ws/VB/CDG/eE.ZYMByUdehy7R9helfUPeRpLXnvEP03a",
+      "id": 5
+    },
+    {
+      "email": "",
+      "nome": "",
+      "senha": "$2b$12$LkVGN.4/ENImHNz8pIx8nuG.MiSGGwu0ANABLNK.Wp9NoIyKTfyQa",
+      "id": 6
+    }
+  ],
+  "tarefas": [
+    {
+      "tarefa": "corrida",
+      "inicio": "09/01/2024 17:07Tundefined",
+      "fim": "12/01/2024 18:08Tundefined",
+      "descricao": "aaaaaaaaaaaaaa",
+      "status": "Realizada",
+      "estaDeletado": true,
+      "usuarioId": 2,
+      "id": 1
+    },
+    {
+      "tarefa": "casa",
+      "inicio": "10/01/2024 17:09Tundefined",
+      "fim": "07/12/2023 18:09Tundefined",
+      "descricao": "aaaaaaaaaaa",
+      "status": "Realizada",
+      "estaDeletado": true,
+      "usuarioId": 2,
+      "id": 2
+    },
+    {
+      "tarefa": "casa2",
+      "inicio": "2024-01-02T18:27",
+      "fim": "2024-01-10T19:27",
+      "descricao": "aaaaaaaaaaaa",
+      "status": "Realizada",
+      "estaDeletado": true,
+      "usuarioId": 2,
+      "id": 3
+    },
+    {
+      "tarefa": "corrida2",
+      "inicio": "10/01/2024 17:28Tundefined",
+      "fim": "20/01/2024 18:28Tundefined",
+      "descricao": "aaaaaaaaaaaaaaaaaaaaaa",
+      "status": "Realizada",
+      "estaDeletado": true,
+      "usuarioId": 2,
+      "id": 4
+    },
+    {
+      "tarefa": "corrida",
+      "inicio": "2024-01-11T07:45",
+      "fim": "2024-01-11T08:45",
+      "descricao": "aaaa",
+      "status": "Realizada",
+      "estaDeletado": false,
+      "usuarioId": 2,
+      "id": 5
+    },
+    {
+      "tarefa": "casa2",
+      "inicio": "2024-01-11T08:49",
+      "fim": "2024-01-11T08:49",
+      "descricao": "aaaaaaaaaaaa",
+      "status": "Pendente",
+      "estaDeletado": false,
+      "usuarioId": 2,
+      "id": 6
+    }
+  ]
+}
