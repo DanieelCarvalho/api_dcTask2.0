@@ -10,17 +10,17 @@ import cors from "cors";
 // cors => para conseguir fazer a requisição
 const app = express();
 //servidor para criar as reque post, get, delete
-const port = 3000;
-const privateKey = "galodelutaehmeuovo";
+import { port, privateKey } from "./constantes.js";
+import authMiddleware from "./authMiddleware.js";
 import dayjs from "dayjs";
 import db from "./connect.js";
 //privateKey para gerar o token e verificar. palavra secreta
 app.use(express.json());
 app.use(cors());
 
-app.get("/", async (req, res) => {
-  const usuarios = await db.db.query("SELECT * FROM usuarios");
-  res.send(usuarios[0]);
+app.get("/", authMiddleware, async (req, res) => {
+  // const usuarios = await db.db.query("SELECT * FROM usuarios");
+  res.send(res.locals);
 });
 
 app.post("/cadastro", async (req, res) => {
@@ -48,93 +48,117 @@ app.post("/cadastro", async (req, res) => {
   res.status(201).send(result);
 });
 
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
   const email = req.body?.email;
   const senha = req.body?.senha;
   if (!email || !senha) {
     return res.status(401).send({ message: "payload inválido" });
   }
-  const data = JSON.parse(fs.readFileSync("./db.json", "utf8"));
 
-  const usuario = data.usuario.find((user) => user.email === email);
-  if (!usuario)
-    return res.status(401).send({ message: "usuario ou senha inválida" });
+  try {
+    const [result] = await db.db.query("SELECT * FROM usuarios WHERE email=?", [
+      email,
+    ]);
 
-  const senhaCerta = bcrypt.compareSync(senha, usuario.senha);
-  if (!senhaCerta) {
-    return res.status(401).send({ message: "usuario ou senha inválida" });
-  }
-  const token = jwt.sign(
-    { email, id: usuario.id, nome: usuario.nome },
-    privateKey,
-    {
-      expiresIn: "7d",
+    const usuario = result[0];
+
+    if (!usuario) {
+      return res.status(401).send({ message: "usuário ou senha inválida" });
     }
-  );
 
-  res.send({ token, username: usuario.nome });
+    const senhaCerta = bcrypt.compareSync(senha, usuario.senha);
+    if (!senhaCerta) {
+      return res.status(401).send({ message: "usuário ou senha inválida" });
+    }
+
+    const token = jwt.sign(
+      { email, id: usuario.id, nome: usuario.nome },
+      privateKey,
+      {
+        expiresIn: "7d",
+      }
+    );
+
+    res.send({ token, username: usuario.nome });
+  } catch (error) {
+    console.error("Erro ao realizar login:", error);
+    res.status(500).send({ message: "Erro interno do servidor" });
+  }
 });
 
-app.post("/tarefas", (req, res) => {
-  req.headers;
-  const bearerToken = req.headers.authorization;
-  const token = bearerToken.replace("Bearer ", "");
-  if (!token) return res.status(401);
-  const decoded = jwt.verify(token, privateKey);
+app.post("/tarefas", authMiddleware, async (req, res) => {
+  const decoded = res.locals.user;
 
-  console.log(decoded);
   const { tarefa, fim, inicio, descricao } = req.body;
 
   if (!tarefa || !fim || !inicio || !descricao) {
     return res.status(400).send({ message: "payload inválido" });
   }
-  const data = JSON.parse(fs.readFileSync("./db.json", "utf8"));
+  // const data = JSON.parse(fs.readFileSync("./db.json", "utf8"));
+  // const [usuario] = await db.db.query("SELECT * FROM tarefas WHERE id=?", [
+  //   decoded.id,
+  // ]);
 
-  const tarefas = data.tarefas.filter(
-    (tarefa) => tarefa.usuarioId === decoded.id && !tarefa.estaDeletado
-  );
-  const teste2 = tarefas.map(() => {
-    return tarefa.fim === decoded.id;
-  });
+  // const tarefas = data.tarefas.filter(
+  //   (tarefa) => tarefa.usuarioId === decoded.id && !tarefa.estaDeletado
+  // );
+
+  // const novaTarefa = {
+  //   tarefa,
+  //   inicio,
+  //   fim,
+  //   descricao,
+  //   status: "Em andamento",
+  //   estaDeletado: false,
+  //   usuarioId: decoded.id,
+  //   id: data.tarefas.length + 1,
+  // };
 
   const novaTarefa = {
     tarefa,
+    descricao,
     inicio,
     fim,
-    descricao,
-    status: "Em andamento",
     estaDeletado: false,
     usuarioId: decoded.id,
-    id: data.tarefas.length + 1,
+    status: "Em andamento",
   };
 
-  data.tarefas.push(novaTarefa);
+  const [result] = await db.db.query("INSERT INTO tarefas SET ?", [novaTarefa]);
 
-  fs.writeFileSync("./db.json", JSON.stringify(data));
+  // fs.writeFileSync("./db.json", JSON.stringify(data));
   //  fs.writeFileSync ele vai enviar os dados para o db.json
+  // res.status(201).send(novaTarefa);
+  novaTarefa.id = result.insertId;
+
   res.status(201).send(novaTarefa);
 });
 
-app.get("/tarefas", (req, res) => {
-  const bearerToken = req.headers.authorization;
-  const token = bearerToken.replace("Bearer ", "");
-  if (!token) return res.status(401);
-  const decoded = jwt.verify(token, privateKey);
+app.get("/tarefas", authMiddleware, async (req, res) => {
+  const decoded = res.locals.user;
 
-  const data = JSON.parse(fs.readFileSync("./db.json", "utf8"));
+  // const data = JSON.parse(fs.readFileSync("./db.json", "utf8"));
 
-  const tarefas = data.tarefas.filter(
-    (tarefa) => tarefa.usuarioId === decoded.id && !tarefa.estaDeletado
+  // const tarefas = data.tarefas.filter(
+  //   (tarefa) => tarefa.usuarioId === decoded.id && !tarefa.estaDeletado
+  // );
+  const [result] = await db.db.query(
+    "SELECT * FROM tarefas WHERE usuarioId=? AND estaDeletado=0",
+    [decoded.id]
   );
+
+  const tarefas = result;
+  console.log(tarefas);
 
   res.status(200).send(tarefas);
 });
 
-app.get("/tarefas-atraso", (req, res) => {
-  const data = JSON.parse(fs.readFileSync("./db.json", "utf8"));
+app.get("/tarefas-atraso", async (req, res) => {
+  // const data = JSON.parse(fs.readFileSync("./db.json", "utf8"));
+  const [result] = await db.db.query("SELECT * FROM tarefas");
   const dataAtual = new Date().toISOString();
 
-  const tarefas = data.tarefas.map((t) => {
+  const tarefas = result.map((t) => {
     const dataDif = (t.fim - dataAtual) / (1000 * 60 * 60 * 24);
     if (t.status === "Realizada") {
       return t;
@@ -146,81 +170,84 @@ app.get("/tarefas-atraso", (req, res) => {
       return { ...t, status: "Em atraso" };
     }
   });
-  data.tarefas = tarefas;
-  fs.writeFileSync("./db.json", JSON.stringify(data));
+  // data.tarefas = tarefas;
+  // fs.writeFileSync("./db.json", JSON.stringify(data));
   res.send(tarefas.filter((t) => t.status === "Em atraso"));
 
   // console.log(dataFim, "vasco");
 });
 
-app.delete("/tarefas/:id", (req, res) => {
-  const bearerToken = req.headers.authorization;
-  const token = bearerToken.replace("Bearer ", "");
-  if (!token) return res.status(401);
-  const decoded = jwt.verify(token, privateKey);
+app.delete("/tarefas/:id", authMiddleware, async (req, res) => {
+  const decoded = res.locals.user;
   const tarefaId = Number(req.params.id);
-  const data = JSON.parse(fs.readFileSync("./db.json", "utf8"));
-  const tarefa = data.tarefas.find(
-    (tarefa) =>
-      tarefa.id === tarefaId &&
-      tarefa.usuarioId === decoded.id &&
-      !tarefa.estaDeletado
+  const [result] = await db.db.query(
+    "SELECT * FROM tarefas WHERE id=? AND usuarioId=? AND estaDeletado=0",
+    [tarefaId, decoded.id]
   );
+
+  const tarefa = result[0];
+  // const data = JSON.parse(fs.readFileSync("./db.json", "utf8"));
+  // const tarefa = data.tarefas.find(
+  //   (tarefa) =>
+  //     tarefa.id === tarefaId &&
+  //     tarefa.usuarioId === decoded.id &&
+  //     !tarefa.estaDeletado
+  // );
 
   if (!tarefa) {
     return res.status(404).send({ message: "Tarefa não existe" });
   }
-  const tarefas = data.tarefas.map((tarefa) => {
-    if (tarefaId === tarefa.id) {
-      return {
-        ...tarefa,
-        estaDeletado: true,
-      };
-    }
-    return tarefa;
-  });
 
-  data.tarefas = tarefas;
-  fs.writeFileSync("./db.json", JSON.stringify(data));
+  await db.db.query("UPDATE tarefas SET estaDeletado=1 WHERE id=?", [tarefaId]);
+  // const tarefas = data.tarefas.map((tarefa) => {
+  //   if (tarefaId === tarefa.id) {
+  //     return {
+  //       ...tarefa,
+  //       estaDeletado: true,
+  //     };
+  //   }
+  //   return tarefa;
+  // });
+
+  // data.tarefas = tarefas;
+  // fs.writeFileSync("./db.json", JSON.stringify(data));
   res.status(200).send();
 });
 
-app.put("/tarefas/:id", (req, res) => {
-  const bearerToken = req.headers.authorization;
-  const token = bearerToken.replace("Bearer ", "");
-  if (!token) return res.status(401);
-  const decoded = jwt.verify(token, privateKey);
+app.put("/tarefas/:id", authMiddleware, async (req, res) => {
+  const decoded = res.locals.user;
 
   const { tarefa, fim, inicio, descricao, status } = req.body;
   if (!tarefa || !fim || !inicio || !descricao || !status) {
     return res.status(400).send({ message: "payload inválido" });
   }
   const tarefaId = Number(req.params.id);
-  const data = JSON.parse(fs.readFileSync("./db.json", "utf8"));
-  const tarefaModificada = data.tarefas.find(
-    (tarefa) =>
-      tarefa.id === tarefaId &&
-      tarefa.usuarioId === decoded.id &&
-      !tarefa.estaDeletado
-  );
 
-  if (!tarefaModificada) {
-    return res.status(404).send({ message: "Tarefa não existe" });
-  }
+  // const data = JSON.parse(fs.readFileSync("./db.json", "utf8"));
+  // const tarefaModificada = data.tarefas.find(
+  //   (tarefa) =>
+  //     tarefa.id === tarefaId &&
+  //     tarefa.usuarioId === decoded.id &&
+  //     !tarefa.estaDeletado
+  // );
 
-  const tarefas = data.tarefas.map((t) => {
-    if (tarefaId === t.id) {
-      return {
-        ...t,
-        tarefa,
-        fim,
-        inicio,
-        descricao,
-        status,
-      };
-    }
-    return t;
-  });
+  // if (!tarefaModificada) {
+  //   return res.status(404).send({ message: "Tarefa não existe" });
+  // }
+
+  // const tarefas = data.tarefas.map((t) => {
+  //   if (tarefaId === t.id) {
+  //     return {
+  //       ...t,
+  //       tarefa,
+  //       fim,
+  //       inicio,
+  //       descricao,
+  //       status,
+  //     };
+  //   }
+  //   return t;
+  // });
 
   data.tarefas = tarefas;
   fs.writeFileSync("./db.json", JSON.stringify(data));
