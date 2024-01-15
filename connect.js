@@ -1,11 +1,11 @@
 import mysql from "mysql2/promise";
 
 const db = mysql.createPool({
-  host: "localhost",
-  user: "root",
-  database: "tarefas_db",
-  password: "admin123",
-  port: 3306,
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
 });
 
 export default { db };

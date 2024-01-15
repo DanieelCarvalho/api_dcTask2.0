@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 //express => para criar a api e fazer as requisições
 import jwt from "jsonwebtoken";
@@ -222,7 +223,19 @@ app.put("/tarefas/:id", authMiddleware, async (req, res) => {
     return res.status(400).send({ message: "payload inválido" });
   }
   const tarefaId = Number(req.params.id);
+  const [result] = await db.db.query(
+    "SELECT * FROM tarefas WHERE id=? AND usuarioId=? AND estaDeletado=0",
+    [tarefaId, decoded.id]
+  );
 
+  const tarefaModificada = result[0];
+  if (!tarefaModificada) {
+    return res.status(404).send({ message: "Tarefa não existe" });
+  }
+  await db.db.query(
+    "UPDATE tarefas SET tarefa=?, fim=?, inicio=?, descricao=?, status=? WHERE id=?",
+    [tarefa, fim, inicio, descricao, status, tarefaId]
+  );
   // const data = JSON.parse(fs.readFileSync("./db.json", "utf8"));
   // const tarefaModificada = data.tarefas.find(
   //   (tarefa) =>
@@ -249,8 +262,8 @@ app.put("/tarefas/:id", authMiddleware, async (req, res) => {
   //   return t;
   // });
 
-  data.tarefas = tarefas;
-  fs.writeFileSync("./db.json", JSON.stringify(data));
+  // data.tarefas = tarefas;
+  // fs.writeFileSync("./db.json", JSON.stringify(data));
   res.status(200).send();
 });
 
