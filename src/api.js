@@ -27,25 +27,25 @@ app.post("/cadastro", async (req, res) => {
   const senha = req.body.senha;
   const email = req.body.email;
   const hashSenha = bcrypt.hashSync(senha, 12);
-  const [resultado] = await db.db.query(
+  const [resultado] = await db.query(
     "SELECT * FROM usuarios WHERE email=?",
     [email]
   );
   // const data = JSON.parse(fs.readFileSync("./db.json", "utf8"));
   // const usuarioExiste = !!data.usuario.find((u) => u.email === email);
   const [usuarioExiste] = resultado;
-  console.log(usuarioExiste);
+  
   if (usuarioExiste) {
     return res.status(409).send({ message: "usuário já cadastrado" });
   }
   const sql = `INSERT INTO usuarios(nome, email, senha) VALUES ('${req.body.nome}', '${email}', '${hashSenha}')`;
 
-  const [result, fields] = await db.db.query({ sql });
+  await db.query({ sql });
   // const idUsuario = data.usuario.length + 1;
   // const usuario = { ...req.body, senha: hashSenha, id: idUsuario };
   // data.usuario.push(usuario);
   // fs.writeFileSync("./db.json", JSON.stringify(data));
-  res.status(201).send(result);
+  res.status(201).send({ nome });
 });
 
 app.post("/login", async (req, res) => {
@@ -57,7 +57,7 @@ app.post("/login", async (req, res) => {
   }
 
   try {
-    const [result] = await db.db.query("SELECT * FROM usuarios WHERE email=?", [
+    const [result] = await db.query("SELECT * FROM usuarios WHERE email=?", [
       email,
     ]);
 
@@ -96,7 +96,7 @@ app.post("/tarefas", authMiddleware, async (req, res) => {
     return res.status(400).send({ message: "payload inválido" });
   }
   // const data = JSON.parse(fs.readFileSync("./db.json", "utf8"));
-  // const [usuario] = await db.db.query("SELECT * FROM tarefas WHERE id=?", [
+  // const [usuario] = await db.query("SELECT * FROM tarefas WHERE id=?", [
   //   decoded.id,
   // ]);
 
@@ -125,7 +125,7 @@ app.post("/tarefas", authMiddleware, async (req, res) => {
     status: "Em andamento",
   };
 
-  const [result] = await db.db.query("INSERT INTO tarefas SET ?", [novaTarefa]);
+  const [result] = await db.query("INSERT INTO tarefas SET ?", [novaTarefa]);
 
   // fs.writeFileSync("./db.json", JSON.stringify(data));
   //  fs.writeFileSync ele vai enviar os dados para o db.json
@@ -143,7 +143,7 @@ app.get("/tarefas", authMiddleware, async (req, res) => {
   // const tarefas = data.tarefas.filter(
   //   (tarefa) => tarefa.usuarioId === decoded.id && !tarefa.estaDeletado
   // );
-  const [result] = await db.db.query(
+  const [result] = await db.query(
     "SELECT * FROM tarefas WHERE usuarioId=? AND estaDeletado=0",
     [decoded.id]
   );
@@ -156,7 +156,7 @@ app.get("/tarefas", authMiddleware, async (req, res) => {
 
 app.get("/tarefas-atraso", async (req, res) => {
   // const data = JSON.parse(fs.readFileSync("./db.json", "utf8"));
-  const [result] = await db.db.query("SELECT * FROM tarefas");
+  const [result] = await db.query("SELECT * FROM tarefas");
   const dataAtual = new Date().toISOString();
 
   const tarefas = result.map((t) => {
@@ -181,7 +181,7 @@ app.get("/tarefas-atraso", async (req, res) => {
 app.delete("/tarefas/:id", authMiddleware, async (req, res) => {
   const decoded = res.locals.user;
   const tarefaId = Number(req.params.id);
-  const [result] = await db.db.query(
+  const [result] = await db.query(
     "SELECT * FROM tarefas WHERE id=? AND usuarioId=? AND estaDeletado=0",
     [tarefaId, decoded.id]
   );
@@ -199,7 +199,7 @@ app.delete("/tarefas/:id", authMiddleware, async (req, res) => {
     return res.status(404).send({ message: "Tarefa não existe" });
   }
 
-  await db.db.query("UPDATE tarefas SET estaDeletado=1 WHERE id=?", [tarefaId]);
+  await db.query("UPDATE tarefas SET estaDeletado=1 WHERE id=?", [tarefaId]);
   // const tarefas = data.tarefas.map((tarefa) => {
   //   if (tarefaId === tarefa.id) {
   //     return {
@@ -223,7 +223,7 @@ app.put("/tarefas/:id", authMiddleware, async (req, res) => {
     return res.status(400).send({ message: "payload inválido" });
   }
   const tarefaId = Number(req.params.id);
-  const [result] = await db.db.query(
+  const [result] = await db.query(
     "SELECT * FROM tarefas WHERE id=? AND usuarioId=? AND estaDeletado=0",
     [tarefaId, decoded.id]
   );
@@ -232,7 +232,7 @@ app.put("/tarefas/:id", authMiddleware, async (req, res) => {
   if (!tarefaModificada) {
     return res.status(404).send({ message: "Tarefa não existe" });
   }
-  await db.db.query(
+  await db.query(
     "UPDATE tarefas SET tarefa=?, fim=?, inicio=?, descricao=?, status=? WHERE id=?",
     [tarefa, fim, inicio, descricao, status, tarefaId]
   );
