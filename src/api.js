@@ -11,7 +11,7 @@ import cors from "cors";
 // cors => para conseguir fazer a requisição
 const app = express();
 //servidor para criar as reque post, get, delete
-import { port, privateKey } from "./constantes.js";
+import { port, privateKey, saltRound } from "./constantes.js";
 import authMiddleware from "./authMiddleware.js";
 import dayjs from "dayjs";
 import db from "./connect.js";
@@ -26,21 +26,24 @@ app.get("/", async (req, res) => {
 app.post("/cadastro", async (req, res) => {
   console.log("CADASTRO:")
   try {
-    const senha = req.body.senha;
-    const email = req.body.email;
-    const hashSenha = bcrypt.hashSync(senha, 12);
+    const { nome, senha, email } = req.body;
+    if (!email && !senha && !nome) {
+      return res.status(401).send({ message: "payload inválido" });
+    }
+
+    const hashSenha = bcrypt.hashSync(senha, saltRound);
     const [resultado] = await db.query(
       "SELECT * FROM usuarios WHERE email=?",
       [email]
     );
+
     const [usuarioExiste] = resultado;
-    
     if (usuarioExiste) {
       return res.status(409).send({ message: "usuário já cadastrado" });
     }
-    const sql = `INSERT INTO usuarios(nome, email, senha) VALUES ('${req.body.nome}', '${email}', '${hashSenha}')`;
-
+    const sql = `INSERT INTO usuarios(nome, email, senha) VALUES ('${nome}', '${email}', '${hashSenha}')`;
     await db.query({ sql });
+
     res.status(201).send({ nome });
   } catch (error) {
     console.error("Erro ao cadastrar:", error);
@@ -50,8 +53,8 @@ app.post("/cadastro", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   console.log("LOGIN:")
-  const email = req.body?.email;
-  const senha = req.body?.senha;
+  
+  const { senha, email} = req.body;
   if (!email || !senha) {
     return res.status(401).send({ message: "payload inválido" });
   }
@@ -220,7 +223,7 @@ app.put("/tarefas/:id", authMiddleware, async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || port;
 app.listen(PORT, () => {
   console.log(`Server ouvindo na porta ${PORT}`);
 });
