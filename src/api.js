@@ -130,8 +130,17 @@ app.get("/tarefas", authMiddleware, async (req, res) => {
       "SELECT * FROM tarefas WHERE usuarioId=? AND estaDeletado=0",
       [decoded.id]
     );
+    
+    const tarefas = result.map(r => ({
+      id: r.id,
+      tarefa: r.tarefa,
+      descricao: r.descricao,
+      inicio: r.inicio,
+      fim: r.inicio,
+      status: r.status,
+    }))
 
-    res.status(200).send(result);
+    res.status(200).send(tarefas);
   } catch (error) {
     console.error("Erro ao listar tarefas:", error);
     res.status(500).send({ message: "Erro interno do servidor" });
