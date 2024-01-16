@@ -27,7 +27,7 @@ app.post("/cadastro", async (req, res) => {
   console.log("CADASTRO:")
   try {
     const { nome, senha, email } = req.body;
-    if (!email && !senha && !nome) {
+    if (!email || !senha || !nome) {
       return res.status(401).send({ message: "payload inválido" });
     }
 
@@ -53,7 +53,7 @@ app.post("/cadastro", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   console.log("LOGIN:")
-  
+
   const { senha, email} = req.body;
   if (!email || !senha) {
     return res.status(401).send({ message: "payload inválido" });
