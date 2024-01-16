@@ -18,10 +18,9 @@ import db from "./connect.js";
 //privateKey para gerar o token e verificar. palavra secreta
 app.use(express.json());
 app.use(cors());
-
-app.get("/", authMiddleware, async (req, res) => {
-  // const usuarios = await db.db.query("SELECT * FROM usuarios");
-  res.send(res.locals);
+console.log(process.env.DB_HOST);
+app.get("/", async (req, res) => {
+  res.send("Esta API está sendo executada!");
 });
 
 app.post("/cadastro", async (req, res) => {
@@ -50,6 +49,7 @@ app.post("/cadastro", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
+  console.log("Request:LOGIN");
   const email = req.body?.email;
   const senha = req.body?.senha;
   if (!email || !senha) {
@@ -266,7 +266,7 @@ app.put("/tarefas/:id", authMiddleware, async (req, res) => {
   // fs.writeFileSync("./db.json", JSON.stringify(data));
   res.status(200).send();
 });
-
-app.listen(port, () => {
-  console.log(`Server ouvindo na porta ${port}`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server ouvindo na porta ${PORT}`);
 });
