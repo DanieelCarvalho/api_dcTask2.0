@@ -136,7 +136,7 @@ app.get("/tarefas", authMiddleware, async (req, res) => {
       tarefa: r.tarefa,
       descricao: r.descricao,
       inicio: r.inicio,
-      fim: r.inicio,
+      fim: r.fim,
       status: r.status,
     }))
 
