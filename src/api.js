@@ -240,4 +240,11 @@ const PORT = process.env.PORT || port;
 app.listen(PORT, () => {
   console.log(`Server ouvindo na porta ${PORT}`);
 });
-console.log("Estudo");
+console.log("AQUI!")
+console.log("AQUI!")
+console.log("AQUI!")
+console.log("AQUI!")
+console.log("AQUI!")
+
+console.log("AQUI!")
+console.log("AQUI!")
