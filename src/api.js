@@ -24,7 +24,7 @@ app.get("/", async (req, res) => {
 });
 
 app.post("/cadastro", async (req, res) => {
-  console.log("CADASTRO:")
+  console.log("CADASTRO:");
   try {
     const { nome, senha, email } = req.body;
     if (!email || !senha || !nome) {
@@ -32,10 +32,9 @@ app.post("/cadastro", async (req, res) => {
     }
 
     const hashSenha = bcrypt.hashSync(senha, saltRound);
-    const [resultado] = await db.query(
-      "SELECT * FROM usuarios WHERE email=?",
-      [email]
-    );
+    const [resultado] = await db.query("SELECT * FROM usuarios WHERE email=?", [
+      email,
+    ]);
 
     const [usuarioExiste] = resultado;
     if (usuarioExiste) {
@@ -52,9 +51,9 @@ app.post("/cadastro", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  console.log("LOGIN:")
+  console.log("LOGIN:");
 
-  const { senha, email} = req.body;
+  const { senha, email } = req.body;
   if (!email || !senha) {
     return res.status(401).send({ message: "payload inválido" });
   }
@@ -91,7 +90,7 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/tarefas", authMiddleware, async (req, res) => {
-  console.log("CRIAR_TAREFA:")
+  console.log("CRIAR_TAREFA:");
   try {
     const decoded = res.locals.user;
 
@@ -123,22 +122,22 @@ app.post("/tarefas", authMiddleware, async (req, res) => {
 });
 
 app.get("/tarefas", authMiddleware, async (req, res) => {
-  console.log("LISTAR_TAREFAS:")
+  console.log("LISTAR_TAREFAS:");
   try {
     const decoded = res.locals.user;
     const [result] = await db.query(
       "SELECT * FROM tarefas WHERE usuarioId=? AND estaDeletado=0",
       [decoded.id]
     );
-    
-    const tarefas = result.map(r => ({
+
+    const tarefas = result.map((r) => ({
       id: r.id,
       tarefa: r.tarefa,
       descricao: r.descricao,
       inicio: r.inicio,
       fim: r.fim,
       status: r.status,
-    }))
+    }));
 
     res.status(200).send(tarefas);
   } catch (error) {
@@ -148,11 +147,11 @@ app.get("/tarefas", authMiddleware, async (req, res) => {
 });
 
 app.get("/tarefas-atraso", async (req, res) => {
-  console.log("STATUS_TAREFA")
+  console.log("STATUS_TAREFA");
   try {
     const [result] = await db.query("SELECT * FROM tarefas");
     const dataAtual = new Date().toISOString();
-    const diaEmMilisegundos = 1000 * 60 * 60 * 24
+    const diaEmMilisegundos = 1000 * 60 * 60 * 24;
 
     const tarefas = result.map((t) => {
       const dataDif = (t.fim - dataAtual) / diaEmMilisegundos;
@@ -167,10 +166,13 @@ app.get("/tarefas-atraso", async (req, res) => {
       }
     });
 
-    tarefas.forEach(async tarefa => {
-      if(tarefa.status === 'Realizada') return
-      await db.query("UPDATE tarefas SET status=? WHERE id=?", [tarefa.status, tarefa.id]);
-    })
+    tarefas.forEach(async (tarefa) => {
+      if (tarefa.status === "Realizada") return;
+      await db.query("UPDATE tarefas SET status=? WHERE id=?", [
+        tarefa.status,
+        tarefa.id,
+      ]);
+    });
 
     res.send(tarefas.filter((t) => t.status === "Em atraso"));
   } catch (error) {
@@ -180,7 +182,7 @@ app.get("/tarefas-atraso", async (req, res) => {
 });
 
 app.delete("/tarefas/:id", authMiddleware, async (req, res) => {
-  console.log("DELETAR_TAREFA:")
+  console.log("DELETAR_TAREFA:");
   try {
     const decoded = res.locals.user;
     const tarefaId = Number(req.params.id);
@@ -203,7 +205,7 @@ app.delete("/tarefas/:id", authMiddleware, async (req, res) => {
 });
 
 app.put("/tarefas/:id", authMiddleware, async (req, res) => {
-  console.log("ATUALIZAR_TAREFA:")
+  console.log("ATUALIZAR_TAREFA:");
   try {
     const decoded = res.locals.user;
 
@@ -232,8 +234,8 @@ app.put("/tarefas/:id", authMiddleware, async (req, res) => {
   }
 });
 
-console.log('Estou aqui!')
-console.log("AQUI!")
+console.log("Estou aqui!");
+
 const PORT = process.env.PORT || port;
 app.listen(PORT, () => {
   console.log(`Server ouvindo na porta ${PORT}`);
