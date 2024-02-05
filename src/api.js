@@ -232,7 +232,7 @@ app.put("/tarefas/:id", authMiddleware, async (req, res) => {
   }
 });
 
-//daniel monitor
+console.log('Estou aqui!')
 
 const PORT = process.env.PORT || port;
 app.listen(PORT, () => {
