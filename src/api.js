@@ -232,6 +232,8 @@ app.put("/tarefas/:id", authMiddleware, async (req, res) => {
   }
 });
 
+console.log('Estou aqui!')
+
 const PORT = process.env.PORT || port;
 app.listen(PORT, () => {
   console.log(`Server ouvindo na porta ${PORT}`);
